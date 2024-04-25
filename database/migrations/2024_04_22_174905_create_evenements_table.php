@@ -14,8 +14,13 @@ return new class extends Migration
         Schema::create('evenements', function (Blueprint $table) {
             $table->id();
             $table->string('types')->nullable();
-            $table->string('description')->nullable();
-            $table->string('date')->nullable();
+            $table->string('date_evenement')->nullable();
+            $table->string('date_fin')->nullable();
+            $table->bigInteger('prix')->nullable();
+            $table->boolean('validation')->nullable();
+            $table->integer('note_evenement')->nullable();
+            $table->bigInteger('client_id')->nullable();
+            $table->foreign('client_id')->references('id')->on('clients');
             $table->timestamps();
         });
     }

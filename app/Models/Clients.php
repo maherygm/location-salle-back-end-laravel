@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Clients extends Model
 {
     use HasFactory;
+
+    public function evenement()
+    {
+        return $this->hasMany(Evenement::class);
+    }
 }
