@@ -19,8 +19,7 @@ return new class extends Migration
             $table->bigInteger('prix')->nullable();
             $table->boolean('validation')->nullable();
             $table->integer('note_evenement')->nullable();
-            $table->bigInteger('client_id')->nullable();
-            $table->foreign('client_id')->references('id')->on('clients');
+            $table->bigInteger('client_id');
             $table->timestamps();
         });
     }

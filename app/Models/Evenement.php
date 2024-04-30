@@ -11,6 +11,6 @@ class Evenement extends Model
 
     public function clients()
     {
-        return $this->belongsTo(Clients::class, "client_id", "id");
+       
     }
 }
