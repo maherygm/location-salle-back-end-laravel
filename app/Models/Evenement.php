@@ -9,8 +9,13 @@ class Evenement extends Model
 {
     use HasFactory;
 
-    public function clients()
-    {
-       
-    }
+    protected $fillable = [
+        'types',
+        'date_evenement',
+        'date_fin',
+        'prix',
+        'validation',
+        'note_evenement',
+        'client_id',
+    ];
 }

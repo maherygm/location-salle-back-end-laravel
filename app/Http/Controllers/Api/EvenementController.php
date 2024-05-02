@@ -3,100 +3,86 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateEvenementRequest;
-use App\Http\Requests\EditEvenementRequest;
 use App\Models\Evenement;
-use Exception;
 use Illuminate\Http\Request;
 
 class EvenementController extends Controller
 {
-    //
-
-    public function getAll()
+    // Méthode pour afficher tous les événements
+    public function index()
     {
-
         try {
-            $evenement =  Evenement::all();
-            return response()->json(
-                [
-                    'status_code' => 200,
-                    'status_message' => 'toutes les postes',
-                    'data' => $evenement
-                ]
-            );
-        } catch (Exception $erreur) {
-            return response()->json($erreur->getMessage(), 500);
+            $evenements = Evenement::all();
+            return response()->json(['success' => true, 'message' => 'Liste des événements récupérée avec succès.', 'data' => $evenements], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erreur lors de la récupération des événements.'], 500);
         }
     }
-    public function add(CreateEvenementRequest $request)
+
+    // Méthode pour créer un nouvel événement
+    public function store(Request $request)
     {
 
-        try {
-            $evenement = new Evenement();
-            $evenement->types = $request->types;
-            $evenement->description = $request->description;
-            $evenement->date = $request->date;
-            $evenement->save();
+        if ($request->has('validation')) {
+            $request->merge(['validation' => $request->input('validation') === 'oui' ? true : false]);
+        }
 
+        // Validation des données de la requête
+        $request->validate([
+            'types' => 'nullable|string|max:255',
+            'date_evenement' => 'nullable|date',
+            'date_fin' => 'nullable|date',
+            'prix' => 'nullable|numeric',
+            'validation' => 'nullable|boolean',
+            'note_evenement' => 'nullable|integer',
+            'client_id' => 'required|exists:clients,id',
+        ]);
 
-            return response()->json(
-                [
-                    'status_code' => 200,
-                    'status_message' => 'le post a éte ajouté',
-                    'data' => $evenement
-                ]
-            );
-        } catch (Exception $erreur) {
-            return response()->json($erreur->getMessage(), 500);
+        try {
+            // Création de l'événement
+            $evenement = Evenement::create($request->all());
+
+            // Retourner la réponse JSON avec succès
+            return response()->json(['success' => true, 'message' => 'Événement créé avec succès.', 'data' => $evenement], 201);
+        } catch (\Exception $e) {
+            // Retourner la réponse JSON en cas d'erreur
+            return response()->json(['success' => false, 'message' => 'Erreur lors de la création de l\'événement.'], 500);
         }
+        
     }
-    public function edit(EditEvenementRequest  $request, Evenement $evenement)
+
+    // Méthode pour afficher un événement spécifique
+    public function show($id)
     {
         try {
-            $evenement->types = $request->types;
-            $evenement->description = $request->description;
-            $evenement->date = $request->date;
-            $evenement->save();
-            return response()->json(
-                [
-                    'status_code' => 200,
-                    'status_message' => 'le post a éte modifié',
-                    'data' => $evenement
-                ]
-            );
-        } catch (Exception $erreur) {
-            return response()->json($erreur->getMessage(), 500);
+            $evenement = Evenement::findOrFail($id);
+            return response()->json(['success' => true, 'message' => 'Événement trouvé avec succès.', 'data' => $evenement], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Événement non trouvé.'], 404);
         }
     }
-    public function getOne(Request $request, Evenement $evenement)
+
+    // Méthode pour mettre à jour un événement
+    public function update(Request $request, $id)
     {
         try {
-            return response()->json(
-                [
-                    'status_code' => 200,
-                    'status_message' => 'le post a éte recuperé',
-                    'data' => $evenement
-                ]
-            );
-        } catch (Exception $erreur) {
-            return response()->json($erreur->getMessage(), 500);
+            $evenement = Evenement::findOrFail($id);
+            $evenement->update($request->all());
+            return response()->json(['success' => true, 'message' => 'Événement mis à jour avec succès.', 'data' => $evenement], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erreur lors de la mise à jour de l\'événement.'], 500);
         }
     }
-    public function delete(Request $request, Evenement $evenement)
+
+    // Méthode pour supprimer un événement
+    public function destroy($id)
     {
         try {
+            $evenement = Evenement::findOrFail($id);
             $evenement->delete();
-
-            return response()->json(
-                [
-                    'status_code' => 200,
-                    'status_message' => 'le post a éte supprimé',
-                    'data' => $evenement
-                ]
-            );
-        } catch (Exception $erreur) {
-            return response()->json($erreur->getMessage(), 500);
+            return response()->json(['success' => true, 'message' => 'Événement supprimé avec succès.'], 204);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erreur lors de la suppression de l\'événement.'], 500);
         }
     }
 }
